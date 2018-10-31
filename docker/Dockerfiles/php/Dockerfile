@@ -64,7 +64,7 @@ RUN printf "\n" | pecl install \
         xdebug
 
 RUN a2enmod rewrite headers mime ssl
-
+RUN usermod -u 1000 www-data
 
 EXPOSE 443
 EXPOSE 80
