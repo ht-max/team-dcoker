@@ -1,0 +1,46 @@
+version: "3"
+
+services:
+  php:
+    build: ./Dockerfiles/php
+    restart: always
+    ports:
+      - "8870:80"
+      - "8871:443"
+    volumes:
+      - ../www/:/www/:rw
+      - ./image-files/etc/apache2/sites-enabled/zzz.conf:/etc/apache2/sites-enabled/zzz.conf:ro
+      - ./image-files/etc/php/zzz.ini:/usr/local/etc/php/conf.d/zzz.ini:ro
+    depends_on:
+      - database
+      - phpmyadmin
+
+  database:
+    image: mariadb:10.3
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${BD_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+    volumes:
+      - team-db:/var/lib/mysql/
+      - ./image-files/mysql/:/docker-entrypoint-initdb.d
+      - ./image-files/etc/mysql/conf.d/zzz.cnf:/etc/mysql/conf.d/zzz.cnf:ro
+
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    environment:
+      PMA_HOST: database
+      PMA_USER: ${BD_USER}
+      PMA_PASSWORD: ${DB_PASS}
+    ports:
+      - "8872:80"
+
+
+volumes:
+  team-db:
+
+
